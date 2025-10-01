@@ -1,0 +1,286 @@
+1. OSPF Basics
+
+Full Name: Open Shortest Path First
+
+Protocol Type: Link-State Routing Protocol
+
+OSI Layer: Layer 3 (Network)
+
+Metric: Cost (based on bandwidth)
+
+Algorithm: Dijkstra SPF (Shortest Path First)
+
+IP Support: IPv4 & IPv6 (OSPFv2 for IPv4, OSPFv3 for IPv6)
+
+Routing Type: Classless (supports VLSM)
+
+2. OSPF Terminology
+
+Router ID (RID): Unique 32-bit identifier for each OSPF router (highest IP on loopback by default, otherwise highest active IP on a router)
+
+LSA (Link State Advertisement): OSPF message type that advertises network topology.
+
+LSDB (Link-State Database): Complete map of the OSPF network stored on each router.
+
+Cost: Metric for OSPF path selection = 100,000,000 / interface bandwidth (in bps)
+
+Hello Packet: Used to discover and maintain OSPF neighbors.
+
+Neighbor: Another OSPF router with which an adjacency has been formed.
+
+Adjacency: Relationship formed between OSPF routers to exchange LSAs.
+
+3. OSPF Areas
+
+OSPF is hierarchical to reduce routing overhead.
+
+Backbone Area (Area 0): Central area all other areas connect to.
+
+Standard Area: Regular non-backbone area.
+
+Stub Area: No external routes, only intra-area and default routes.
+
+Totally Stubby Area: No external routes, only default and intra-area.
+
+Not-So-Stubby Area (NSSA): Allows limited external routes in stub areas.
+
+Area Types Impact LSAs:
+
+Type 1: Router LSA (inside area)
+
+Type 2: Network LSA (multi-access networks)
+
+Type 3: Summary LSA (between areas)
+
+Type 4: ASBR Summary LSA
+
+Type 5: External LSA (from ASBR)
+
+Type 7: NSSA External LSA
+
+4. OSPF Network Types
+
+Broadcast: Ethernet; elects DR/BDR
+
+Non-Broadcast Multi-Access (NBMA): Frame Relay; elects DR/BDR manually
+
+Point-to-Point: No DR/BDR; automatically forms adjacency
+
+Point-to-Multipoint: Treats NBMA links as multiple point-to-point
+
+Loopback: Passive; used for router ID selection
+
+5. OSPF Neighbor States
+
+OSPF routers go through these states to form adjacency:
+
+Down – No hello heard yet.
+
+Init – Hello received, but no two-way communication.
+
+2-Way – Bidirectional communication established.
+
+ExStart – Routers decide master/slave for DB exchange.
+
+Exchange – LSAs exchanged.
+
+Loading – Request missing LSAs.
+
+Full – Adjacency fully established.
+
+6. OSPF Cost Calculation
+
+Formula: Cost = Reference Bandwidth / Interface Bandwidth
+
+Default Reference Bandwidth: 100 Mbps
+
+Examples:
+
+FastEthernet 100 Mbps → Cost = 1
+
+GigabitEthernet 1 Gbps → Cost = 0.1 → rounded to 1 by default
+
+Tip: Change reference bandwidth for multiple Gbps links:
+
+auto-cost reference-bandwidth 10000  # for 10 Gbps
+
+7. OSPF Configuration (Cisco IOS Example)
+Step 1: Enable OSPF
+router ospf 1        # process ID = 1
+router-id 1.1.1.1    # optional, otherwise auto-selected
+
+Step 2: Configure Interfaces
+network 192.168.1.0 0.0.0.255 area 0
+network 10.0.0.0 0.0.0.255 area 1
+
+Step 3: Optional Config
+passive-interface Gig0/1      # prevent OSPF hellos on certain interfaces
+default-information originate  # advertise default route
+
+8. OSPF Routing Table
+
+OSPF routes are identified by O in routing table.
+
+OSPF inter-area routes: O IA
+
+OSPF external routes: O E1 or O E2
+
+E1: Cost includes internal + external
+
+E2: Only external cost (default)
+
+9. OSPF Troubleshooting Commands
+
+show ip ospf neighbor → view neighbor states
+
+show ip ospf interface → check OSPF on interfaces
+
+show ip ospf database → view LSDB
+
+show ip route ospf → check OSPF learned routes
+
+debug ip ospf adj → troubleshoot adjacency issues
+
+10. Key Exam Tips
+
+OSPF requires matching hello and dead intervals to form adjacency.
+
+DR/BDR election: Highest priority wins; then highest RID.
+
+Use loopback interfaces for stable router IDs.
+
+Always summarize routes where possible to reduce LSDB size.
+
+Stub areas prevent external route flooding into the area.
+
+Remember: All non-backbone areas must connect to area 0 (backbone).
+
+
+
+OSPF Cheat Sheet
+1. OSPF Basics
+Feature	Details
+Protocol Type	Link-State
+Layer	3 (Network)
+Algorithm	Dijkstra SPF
+Metric	Cost (based on bandwidth)
+Routing Type	Classless (VLSM supported)
+IP Support	IPv4 (OSPFv2), IPv6 (OSPFv3)
+2. OSPF Router ID
+
+32-bit unique ID
+
+Selection order:
+
+Manual router-id
+
+Highest loopback IP
+
+Highest active physical interface IP
+
+3. OSPF Areas
+Area Type	Description
+Backbone (0)	Must connect all other areas
+Standard	Regular area
+Stub	No external routes (only intra-area + default)
+Totally Stubby	Only intra-area + default route
+NSSA	Stub with limited external routes
+4. OSPF Network Types
+Type	DR/BDR	Notes
+Broadcast (Ethernet)	Yes	Default for LAN
+NBMA (Frame Relay)	Yes	Manual DR/BDR
+Point-to-Point	No	Automatically forms adjacency
+Point-to-Multipoint	No	Treated as multiple P2P links
+Loopback	No	Passive, used for RID
+5. OSPF Neighbor States
+State	Description
+Down	No hello received
+Init	Hello received, two-way not established
+2-Way	Two-way communication achieved
+ExStart	Decide master/slave for DB exchange
+Exchange	Exchange LSAs
+Loading	Request missing LSAs
+Full	Adjacency complete
+6. OSPF Cost
+
+Formula: Cost = Reference BW / Interface BW
+
+Default Reference BW: 100 Mbps
+
+Examples:
+
+FastEthernet 100 Mbps → 1
+
+GigabitEthernet 1 Gbps → 1 (rounded)
+
+Change reference bandwidth:
+
+auto-cost reference-bandwidth 10000  # for 10 Gbps
+
+7. OSPF LSA Types
+LSA Type	Purpose
+1	Router LSA (intra-area)
+2	Network LSA (multi-access)
+3	Summary LSA (between areas)
+4	ASBR Summary LSA
+5	External LSA (from ASBR)
+7	NSSA External LSA
+8. DR/BDR Election
+
+Highest priority wins (0–255)
+
+If tie → Highest Router ID
+
+Priority 0 → cannot become DR/BDR
+
+9. OSPF Commands
+
+Basic Configuration
+
+router ospf 1
+ router-id 1.1.1.1
+ network 192.168.1.0 0.0.0.255 area 0
+ passive-interface Gig0/1
+
+
+Verification
+
+show ip ospf neighbor
+show ip ospf interface
+show ip ospf database
+show ip route ospf
+debug ip ospf adj
+
+10. OSPF Routing Table Codes
+Code	Meaning
+O	Intra-area route
+O IA	Inter-area route
+O E1	External route (includes internal cost)
+O E2	External route (only external cost)
+11. Exam Tips
+
+Hello & Dead intervals must match to form adjacency.
+
+Use loopback interfaces for stable router IDs.
+
+All non-backbone areas must connect to Area 0.
+
+Summarize routes to reduce LSDB size.
+
+Stub areas block external LSAs to reduce flooding.
+
+Remember cost calculation for path selection.
+
+12. Quick OSPF Diagram
+         Area 1            Area 2
+       R1 ------ R2 ------ R3
+       |        |         |
+       |        |         |
+       +----Area 0 Backbone---+
+
+
+All areas connect to backbone Area 0.
+
+DR/BDR elected on broadcast networks (LANs).
+
+LSAs flooded within area and summarized to backbone.

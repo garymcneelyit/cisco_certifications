@@ -1,0 +1,223 @@
+1. BGP Basics
+
+Type: Path vector protocol (not distance vector or link-state).
+
+Protocol Number: 179 (TCP-based).
+
+Use Case: Exchanging routing information between autonomous systems (AS) — mainly ISP networks, but can also be used internally (iBGP).
+
+Two Types:
+
+iBGP: Within the same AS.
+
+eBGP: Between different ASes.
+
+Key Concept: BGP advertises networks with path attributes rather than calculating routes like OSPF or EIGRP.
+
+2. BGP Terminology
+Term	Definition
+AS (Autonomous System)	Collection of IP networks under a single administration.
+Peer/Neighbor	Another BGP router you establish a session with.
+Prefix	IP subnet advertised by BGP.
+Next-Hop	IP address to reach the destination network.
+Path Attributes	BGP attributes used to select the best path (weight, local preference, AS path, etc.).
+Route Reflector	iBGP router that helps reduce full mesh requirements.
+Confederation	Split large AS into sub-AS for scaling iBGP.
+3. BGP Operation
+
+Uses TCP 179 for neighbor sessions.
+
+BGP states: Idle → Connect → Active → OpenSent → OpenConfirm → Established.
+
+Advertisement Rules:
+
+eBGP: Advertises connected and learned routes to external peers.
+
+iBGP: Only advertises routes learned from eBGP, not from other iBGP peers (unless using route reflectors or confederations).
+
+4. BGP Attributes
+
+Path Selection Order (Cisco default):
+
+Weight (Cisco-specific, highest wins)
+
+Local Preference (highest wins)
+
+Locally originated routes
+
+AS Path (shortest wins)
+
+Origin type: IGP < EGP < Incomplete
+
+MED (Multi-Exit Discriminator): lower wins
+
+eBGP over iBGP
+
+IGP metric to next-hop
+
+Oldest route
+
+Router ID (highest IP)
+
+Important Attributes:
+
+Attribute	Notes
+Weight	Cisco-only, local to router
+Local Preference	Influences outbound traffic in AS
+AS Path	List of AS numbers the route passed through
+MED	Suggests preferred entry point into AS
+Next-Hop	Next hop IP for the route
+Community	Tag routes for policy purposes
+5. BGP Configuration Basics (Cisco Example)
+eBGP Configuration:
+router bgp 65001
+  neighbor 192.0.2.2 remote-as 65002
+  network 10.0.0.0 mask 255.255.255.0
+
+iBGP Configuration:
+router bgp 65001
+  neighbor 10.1.1.2 remote-as 65001
+  network 10.0.0.0 mask 255.255.255.0
+
+
+Notes:
+
+eBGP neighbors are usually directly connected.
+
+iBGP neighbors can be multiple hops, use ebgp-multihop.
+
+6. Advanced BGP Concepts
+
+Route Reflector: Reduces full-mesh requirement for iBGP.
+
+Confederations: Breaks large AS into smaller ones, simplifies iBGP.
+
+Route Filtering: Using prefix-lists, route-maps, filter-lists.
+
+BGP Aggregation: Summarizes multiple prefixes into one.
+
+BGP Communities: Tagging routes for routing policy.
+
+Next-Hop Self: iBGP router sets itself as next-hop when advertising routes to iBGP peers.
+
+7. BGP Troubleshooting Commands
+
+View neighbors:
+
+show ip bgp summary
+show bgp neighbors
+
+
+Check BGP routes:
+
+show ip bgp
+show ip bgp neighbors <ip> advertised-routes
+show ip bgp neighbors <ip> received-routes
+
+
+Reset BGP session:
+
+clear ip bgp <neighbor>
+
+
+Common issues:
+
+TCP session not established → Check IP reachability, firewall, or AS number mismatch.
+
+Routes not advertised → Check network statement or route filtering.
+
+iBGP blackhole → Full mesh missing or route reflector misconfigured.
+
+8. Key Points to Remember
+
+BGP is policy-based, not metric-based like OSPF/EIGRP.
+
+Always check neighbor relationships before routes.
+
+Loop prevention: eBGP uses AS path; iBGP requires full mesh or route reflectors.
+
+Best path selection is crucial in BGP; manipulate attributes carefully for traffic engineering.
+
+iBGP vs eBGP: eBGP changes next-hop by default; iBGP keeps next-hop as received.
+
+BGP Cheat Sheet
+1. BGP Types
+Type	Description	Default Next-Hop Behavior
+eBGP	Between different AS	Next-hop is changed to local router
+iBGP	Within same AS	Next-hop remains as received
+2. BGP Neighbor Commands (Cisco)
+router bgp <ASN>
+  neighbor <IP> remote-as <ASN>      # define neighbor
+  neighbor <IP> ebgp-multihop <n>    # for iBGP multi-hop
+  network <IP> mask <mask>           # advertise network
+  neighbor <IP> route-reflector-client # optional RR config
+
+
+Check Status:
+
+show ip bgp summary          # neighbor status, prefixes
+show ip bgp neighbors        # detailed neighbor info
+show ip bgp                  # view BGP table
+
+3. BGP States (TCP Session)
+
+Idle → waiting to start
+
+Connect → TCP connection attempt
+
+Active → retrying TCP connection
+
+OpenSent → OPEN message sent
+
+OpenConfirm → OPEN acknowledged
+
+Established → Session up, routes exchanged
+
+4. BGP Path Attributes (Best Path Selection)
+Order	Attribute	Notes
+1	Weight	Cisco-only, local to router
+2	Local Preference	Highest preferred (iBGP)
+3	Locally originated	Routes from network statement
+4	AS Path	Shortest AS path preferred
+5	Origin	IGP < EGP < Incomplete
+6	MED	Lowest preferred (between ASes)
+7	eBGP over iBGP	eBGP preferred
+8	IGP Metric	Metric to next-hop
+9	Oldest route	Tie-breaker
+10	Router ID	Highest IP tie-breaker
+5. BGP Advanced Concepts
+Concept	Purpose
+Route Reflector (RR)	Reduce iBGP full mesh
+Confederation	Split large AS into sub-AS
+Next-Hop Self	iBGP sets itself as next-hop for clients
+BGP Communities	Tagging routes for policies
+Route Filtering	Control advertised/received routes
+Route Aggregation	Summarize multiple prefixes
+6. BGP Troubleshooting Commands
+show ip bgp summary              # neighbor status
+show ip bgp neighbors <IP>       # neighbor info
+show ip bgp                      # all BGP routes
+show ip bgp neighbors <IP> advertised-routes
+show ip bgp neighbors <IP> received-routes
+clear ip bgp <IP>                # reset neighbor
+
+
+Common Issues:
+
+TCP session not established → Check reachability, firewall, AS mismatch
+
+Routes not advertised → Check network statements & filters
+
+iBGP blackhole → Full mesh missing / route reflector misconfig
+
+7. Quick Notes
+
+eBGP neighbors usually directly connected
+
+iBGP requires full mesh or RR
+
+BGP is policy-based, not metric-based
+
+Use attributes to control path selection
+
+

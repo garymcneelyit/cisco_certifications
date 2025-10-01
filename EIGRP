@@ -1,0 +1,324 @@
+1. What is EIGRP?
+
+EIGRP (Enhanced Interior Gateway Routing Protocol) is a Cisco proprietary advanced distance-vector routing protocol.
+
+Sometimes called a hybrid protocol because it has characteristics of both distance-vector and link-state protocols.
+
+Protocol type: Interior Gateway Protocol (IGP)
+
+Supports: IPv4, IPv6, and also MPLS VPNs (with DMVPN)
+
+Administrative Distance (AD):
+
+Internal EIGRP: 90
+
+External EIGRP: 170
+
+2. Key Features
+
+DUAL (Diffusing Update Algorithm): Ensures loop-free paths and fast convergence.
+
+Metric: Uses composite metric based on:
+
+Bandwidth (most important)
+
+Delay
+
+Load (optional)
+
+Reliability (optional)
+
+MTU is not used in metric calculation.
+
+Supports VLSM (Variable Length Subnet Mask)
+
+Neighbor discovery using Hello packets (default 5s for LAN, 60s for WAN)
+
+Reliable transport: Uses TCP-like Reliable Transport Protocol (RTP) for updates.
+
+3. EIGRP Packet Types
+
+Hello – Discovers and maintains neighbors.
+
+Acknowledgment (ACK) – Confirms receipt of update messages.
+
+Update – Sends routing information (partial updates only when there is a change).
+
+Query – Sent when a route fails and a new route is needed.
+
+Reply – Response to a Query.
+
+Request – Requests routing info from a neighbor.
+
+4. EIGRP Metric Calculation
+
+Formula:
+
+Metric
+=
+[
+(
+𝐾
+1
+⋅
+Bandwidth
+)
++
+(
+𝐾
+2
+⋅
+Bandwidth
+256
+−
+Load
+)
++
+𝐾
+3
+⋅
+Delay
+]
+⋅
+𝐾
+5
+𝐾
+4
++
+Reliability
+Metric=[(K
+1
+	​
+
+⋅Bandwidth)+(
+256−Load
+K
+2
+	​
+
+⋅Bandwidth
+	​
+
+)+K
+3
+	​
+
+⋅Delay]⋅
+K
+4
+	​
+
++Reliability
+K
+5
+	​
+
+	​
+
+
+K-values are EIGRP constants (default K1=K3=1, K2=K4=K5=0)
+
+Simplified: Metric = Bandwidth + Delay (default values)
+
+Lower metric → better route
+
+5. EIGRP Tables
+
+EIGRP maintains three main tables:
+
+Neighbor Table
+
+Shows all directly connected EIGRP neighbors.
+
+Verified by Hello packets.
+
+Topology Table
+
+Stores all learned routes from neighbors with feasible distance (FD) and reported distance (RD).
+
+Routes must satisfy Feasible Successor criteria to be considered loop-free.
+
+Routing Table
+
+Contains the best routes to destinations.
+
+Selected from the topology table using DUAL algorithm.
+
+6. Feasible Successor Concept
+
+A backup route stored in the topology table.
+
+Conditions:
+
+Reported Distance < Feasible Distance of the current successor.
+
+Ensures loop-free backup paths.
+
+7. EIGRP Timers
+
+Hello interval: Default 5s LAN, 60s WAN
+
+Hold time: Default 15s LAN, 180s WAN
+
+If neighbor is not heard within this period → neighbor is declared down.
+
+8. EIGRP Configuration (Basic)
+Router(config)# router eigrp 100
+Router(config-router)# network 192.168.1.0 0.0.0.255
+Router(config-router)# no auto-summary
+
+
+100 → EIGRP Autonomous System (AS) number
+
+no auto-summary → disables automatic summarization
+
+9. EIGRP Advanced Commands
+
+Show neighbors: show ip eigrp neighbors
+
+Show topology: show ip eigrp topology
+
+Show routing table: show ip route eigrp
+
+Passive-interface: Stop sending updates on certain interfaces
+
+Redistribute static/other protocols: redistribute ospf metric 10000 100 255 1 1500
+
+10. EIGRP Summarization
+
+Supports manual summarization on any interface.
+
+Automatic summarization occurs on classful network boundaries (can be disabled with no auto-summary).
+
+11. EIGRP for IPv6
+
+EIGRPv6 is configured separately from IPv4.
+
+Router(config)# ipv6 router eigrp 100
+Router(config-rtr)# no shutdown
+Router(config)# interface g0/0
+Router(config-if)# ipv6 eigrp 100
+
+12. Key Advantages
+
+Rapid convergence
+
+Loop-free routing
+
+Supports VLSM and CIDR
+
+Efficient updates (partial and reliable)
+
+Can scale well in large networks
+
+13. Key Limitations
+
+Cisco proprietary (unless using EIGRP for open standard)
+
+Slightly more complex than RIP
+
+Metric calculation may need careful tuning in mixed bandwidth environments
+
+EIGRP Cheat Sheet
+1. Basics
+Feature	Value
+Protocol Type	IGP (Interior Gateway Protocol)
+Cisco Proprietary	Yes (unless using open standard EIGRP)
+Metric Type	Composite (Bandwidth + Delay default)
+Administrative Distance	Internal: 90, External: 170
+Supports	IPv4, IPv6, VLSM, CIDR
+2. Metric Calculation
+
+Default Formula:
+
+Metric
+=
+Bandwidth + Delay
+Metric=Bandwidth + Delay
+
+Bandwidth = 10^7 / minimum bandwidth (in Kbps)
+
+Delay = sum of interface delays (in tens of μs)
+
+Optional: Load, Reliability (requires K-values)
+
+MTU is not used in metric
+
+K-values default:
+
+K1 = 1, K2 = 0, K3 = 1, K4 = 0, K5 = 0
+
+3. Tables
+Table	Purpose
+Neighbor	Tracks directly connected EIGRP routers
+Topology	All learned routes (FD & RD)
+Routing	Best routes selected by DUAL algorithm
+
+Feasible Successor: Loop-free backup route satisfying:
+
+Reported Distance < Feasible Distance of Successor
+Reported Distance < Feasible Distance of Successor
+4. EIGRP Packet Types
+Packet	Function
+Hello	Discover/maintain neighbors
+ACK	Acknowledge updates
+Update	Send routing info
+Query	Ask neighbors for routes
+Reply	Respond to Query
+Request	Request routing info from neighbor
+5. Timers
+Timer	Default LAN	Default WAN
+Hello	5s	60s
+Hold	15s	180s
+6. Basic Configuration
+router eigrp 100
+ network 192.168.1.0 0.0.0.255
+ no auto-summary
+
+
+100 → Autonomous System (AS) number
+
+no auto-summary → disables classful summarization
+
+IPv6 Configuration:
+
+ipv6 router eigrp 100
+ no shutdown
+interface g0/0
+ ipv6 eigrp 100
+
+7. Useful Commands
+Command	Purpose
+show ip eigrp neighbors	Show neighbors
+show ip eigrp topology	Show topology table
+show ip route eigrp	Show EIGRP routes
+passive-interface g0/0	Stop sending updates on interface
+redistribute ospf metric 10000 100 255 1 1500	Redistribute OSPF into EIGRP
+8. Summarization
+
+Automatic summarization: Enabled by default at classful boundaries
+
+Manual summarization: Can be configured on any interface
+
+interface g0/1
+ ip summary-address eigrp 100 192.168.0.0 255.255.252.0
+
+9. Advantages
+
+Fast convergence with DUAL
+
+Loop-free routing
+
+Efficient updates (partial, reliable)
+
+Scales well
+
+Supports VLSM/CIDR
+
+10. Limitations
+
+Cisco proprietary (unless using open standard)
+
+Slightly more complex than RIP
+
+Metric tuning may be needed in mixed bandwidth networks

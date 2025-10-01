@@ -1,0 +1,172 @@
+1. Networking Fundamentals
+
+OSI Model (7 Layers)
+
+Physical – cables, hubs, connectors
+
+Data Link – MAC addresses, switches, VLANs
+
+Network – IP addressing, routing
+
+Transport – TCP/UDP, ports
+
+Session – session management
+
+Presentation – encryption, translation
+
+Application – HTTP, DNS, SMTP
+CP/IP Model
+
+Application, Transport, Internet, Network Access
+
+Map to OSI layers
+
+IPv4 & IPv6
+
+IPv4: 32-bit, 4 octets
+
+IPv6: 128-bit, hex notation
+
+Subnetting: calculate subnets, hosts, and broadcast addresses
+
+Common Protocols
+
+ICMP, ARP, DNS, DHCP, HTTP/HTTPS, FTP, SSH, Telnet
+
+Cabling & Wireless
+
+Ethernet cables (Cat5e, Cat6)
+
+Fiber types (single-mode, multi-mode)
+
+Wi-Fi standards (802.11 a/b/g/n/ac/ax)
+
+
+2. Routing & Switching
+
+Switching Concepts
+
+MAC address table
+
+VLANs: segmentation, VLAN trunking (802.1Q)
+
+STP (Spanning Tree Protocol) – prevents loops
+
+Routing Concepts
+
+Static vs Dynamic Routing
+
+Routing protocols: OSPF, EIGRP, RIP
+
+Default gateway, routing tables
+
+Router Configuration Basics
+
+Router> enable
+Router# configure terminal
+Router(config)# interface GigabitEthernet0/0
+Router(config-if)# ip address 192.168.1.1 255.255.255.0
+Router(config-if)# no shutdown
+Router(config-if)# exit
+Router(config)# router ospf 1
+Router(config-router)# network 192.168.1.0 0.0.0.255 area 0
+
+3. IP Services
+
+NAT (Network Address Translation)
+
+Static, Dynamic, PAT (Port Address Translation)
+
+DHCP
+
+Assigns IP addresses automatically
+
+DNS
+
+Resolves domain names to IPs
+
+SNMP
+
+Monitoring network devices
+
+4. Security Fundamentals
+
+Access Control
+
+ACLs: Standard vs Extended
+
+Device Hardening
+
+Passwords, SSH instead of Telnet
+
+Secure SNMP
+
+Port Security
+
+Limit MAC addresses per port on switches
+
+VPN Basics
+
+Remote secure access
+
+5. Automation & Programmability
+
+SDN Concepts
+
+Controller-based networks
+
+APIs
+
+RESTful APIs to configure network devices
+
+Configuration Management Tools
+
+Ansible, Puppet, Chef (basics)
+
+JSON/YAML
+
+Data representation for automation
+
+6. Troubleshooting & Network Management
+
+Common Commands
+
+ping <IP>           # Test connectivity
+traceroute <IP>     # Trace path
+show ip route       # View routing table
+show interfaces     # Check interface status
+show running-config # View current configuration
+
+Layer-wise Troubleshooting
+
+Physical: cables, link lights
+
+Data link: MAC addresses, VLANs
+
+Network: IP addresses, routing
+
+7. Exam Preparation Tips
+
+Labs
+
+Use Packet Tracer or GNS3 for hands-on practice
+
+Practice Exams
+
+Measure your readiness
+
+Flashcards
+
+Memorize key protocols, port numbers, and subnetting tricks
+
+Time Management
+
+Don’t spend too long on one question
+
+Understand, Don’t Memorize
+
+Focus on why things work, not just commands
+
+
+
+

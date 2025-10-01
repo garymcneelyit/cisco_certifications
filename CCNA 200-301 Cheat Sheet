@@ -1,0 +1,108 @@
+1. Common Commands
+Basic Device Commands
+enable                   # Enter privileged mode
+configure terminal       # Enter global config
+show running-config      # View current config
+show startup-config      # View saved config
+reload                   # Reboot device
+copy running-config startup-config  # Save config
+
+Interface Commands
+interface g0/0
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+
+Routing
+router ospf 1
+ network 192.168.1.0 0.0.0.255 area 0
+show ip route
+show ip ospf neighbor
+
+router eigrp 100
+ network 192.168.1.0
+show ip eigrp neighbors
+
+VLANs & Switches
+vlan 10
+ name Sales
+interface g0/1
+ switchport mode access
+ switchport access vlan 10
+switchport mode trunk
+switchport trunk allowed vlan 10,20
+show vlan brief
+show mac address-table
+
+ACLs
+access-list 10 permit 192.168.1.0 0.0.0.255
+interface g0/0
+ ip access-group 10 in
+
+2. Common Protocols & Ports
+Protocol	Port	Notes
+HTTP	80	Web traffic
+HTTPS	443	Secure web
+FTP	20/21	File transfer
+SSH	22	Secure login
+Telnet	23	Unsecure login
+DNS	53	Domain resolution
+DHCP	67/68	IP assignment
+3. IP Addressing & Subnetting
+IPv4
+
+Total hosts = 2^(32 - subnet mask) - 2
+
+Example: /24 → 2^(32-24)-2 = 254 hosts
+
+Network mask shortcuts:
+
+/24 = 255.255.255.0
+/25 = 255.255.255.128
+/26 = 255.255.255.192
+/27 = 255.255.255.224
+/28 = 255.255.255.240
+
+IPv6
+
+128-bit, colon-hex notation
+
+/64 standard subnet size
+
+No broadcast
+
+4. Spanning Tree Protocol (STP)
+
+Prevents loops in Layer 2 networks
+
+Root Bridge: lowest priority + lowest MAC
+
+STP types: PVST+, RSTP, MSTP
+
+Commands:
+
+show spanning-tree
+spanning-tree vlan 10 priority 4096
+
+5. NAT / PAT
+ip nat inside source list 1 interface g0/0 overload
+access-list 1 permit 192.168.1.0 0.0.0.255
+
+6. Troubleshooting Commands
+ping <IP>
+traceroute <IP>
+show ip interface brief
+show ip route
+show cdp neighbors
+show arp
+
+7. Tips for Exam
+
+Practice subnetting daily
+
+Understand OSI & TCP/IP layers
+
+Memorize common ports and protocols
+
+Use Packet Tracer / GNS3 labs
+
+Understand commands, don’t just memorize

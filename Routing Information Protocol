@@ -1,0 +1,196 @@
+Routing Information Protocol
+
+1. Overview of RIP
+
+Definition: RIP is a distance-vector routing protocol that helps routers share information about network paths.
+
+Type: Interior Gateway Protocol (IGP).
+
+Metric: Uses hop count as its metric (maximum 15 hops; 16 = unreachable).
+
+Versions:
+
+RIP v1: Classful, no support for VLSM or CIDR.
+
+RIP v2: Classless, supports VLSM, multicast updates (224.0.0.9), authentication.
+
+Update interval: Sends updates every 30 seconds.
+
+Convergence: Slower than link-state protocols (like OSPF).
+
+2. Key Concepts
+
+Distance Vector: Routers share their entire routing table with neighbors.
+
+Hop Count: Number of routers a packet passes through. Maximum = 15.
+
+Timers:
+
+Update timer: 30 sec
+
+Invalid timer: 180 sec (marks route as invalid if no update)
+
+Hold-down timer: 180 sec (prevents flapping routes)
+
+Flush timer: 240 sec (removes route from table)
+
+3. RIP Routing Table Example
+Destination	Metric	Next Hop	Interface
+192.168.1.0	1	192.168.12.2	Fa0/0
+192.168.2.0	2	192.168.12.2	Fa0/0
+
+Metric = number of hops to reach network.
+
+4. RIP Configuration (Cisco IOS)
+
+Basic configuration:
+
+Router> enable
+Router# configure terminal
+Router(config)# router rip
+Router(config-router)# version 2        # For RIP v2
+Router(config-router)# network 192.168.1.0
+Router(config-router)# network 192.168.2.0
+Router(config-router)# no auto-summary   # For classless routing
+Router(config-router)# end
+Router# write memory
+
+
+Verify RIP:
+
+show ip route
+show ip protocols
+show ip rip database
+
+5. RIP Timers Commands
+Router(config-router)# timers basic update invalid holddown flush
+
+
+Example:
+
+Router(config-router)# timers basic 30 180 180 240
+
+6. RIP Authentication (RIP v2)
+
+Purpose: Prevent unauthorized updates.
+
+Types: Plaintext or MD5.
+
+Example (plaintext key):
+
+Router(config)# interface g0/0
+Router(config-if)# ip rip authentication mode text
+Router(config-if)# ip rip authentication key-chain RIP-KEYS
+
+
+Key-chain configuration:
+
+Router(config)# key chain RIP-KEYS
+Router(config-keychain)# key 1
+Router(config-keychain-key)# key-string mypassword
+
+7. Best Practices & Exam Tips
+
+Remember hop count limit: 16 = unreachable.
+
+Use RIP v2 for modern networks because v1 does not support VLSM.
+
+Turn off auto-summary when using discontiguous networks.
+
+Know timers and their purpose for troubleshooting exams.
+
+Check convergence time and understand count-to-infinity problem.
+
+RIP works best in small networks due to its simplicity and hop count limitation.
+
+8. Troubleshooting Commands
+
+debug ip rip – Monitor RIP updates in real-time.
+
+show ip route – Check learned routes.
+
+show ip protocols – Check RIP configuration and timers.
+
+ping/traceroute – Verify connectivity through learned routes.
+
+
+
+
+RIP Quick Reference Cheat Sheet
+1. Overview
+
+Protocol Type: Distance-vector IGP
+
+Metric: Hop count (1–15, 16 = unreachable)
+
+Versions:
+
+RIP v1: Classful, no VLSM/CIDR
+
+RIP v2: Classless, supports VLSM, CIDR, multicast (224.0.0.9), authentication
+
+Update Interval: 30 sec
+
+Timers: Update 30, Invalid 180, Hold-down 180, Flush 240
+
+2. Basic Commands
+Enable RIP
+Router> enable
+Router# configure terminal
+Router(config)# router rip
+Router(config-router)# version 2          # Use v2
+Router(config-router)# network <network>
+Router(config-router)# no auto-summary     # Classless routing
+Router(config-router)# end
+Router# write memory
+
+Verify RIP
+show ip route
+show ip protocols
+show ip rip database
+
+3. RIP Timers
+Timer	Default (sec)	Purpose
+Update	30	Sends updates periodically
+Invalid	180	Marks route as invalid if no update
+Hold-down	180	Prevents route flapping
+Flush	240	Removes route from table
+
+Set custom timers:
+
+Router(config-router)# timers basic <update> <invalid> <holddown> <flush>
+
+4. RIP Authentication (v2)
+Key-chain setup
+Router(config)# key chain RIP-KEYS
+Router(config-keychain)# key 1
+Router(config-keychain-key)# key-string mypassword
+
+Interface authentication
+Router(config)# interface g0/0
+Router(config-if)# ip rip authentication mode text
+Router(config-if)# ip rip authentication key-chain RIP-KEYS
+
+5. Troubleshooting
+
+debug ip rip – Monitor RIP updates
+
+show ip route – View learned routes
+
+show ip protocols – Check RIP config & timers
+
+ping <ip> / traceroute <ip> – Verify path
+
+Watch for count-to-infinity and max hop 15 issues
+
+6. Exam Tips
+
+Always use RIP v2 for modern networks.
+
+Disable auto-summary in discontiguous networks.
+
+Memorize timers and their functions.
+
+Small networks only—RIP is limited by hop count.
+
+Know distance vector concepts, route advertisement, and convergence behavior.
